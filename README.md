@@ -15,7 +15,7 @@ Or, install opa and watchify
 ```
 npm install -g opa watchify
 cd gol
-opa -e entry.js
+opa -e entry.js -o public/bundle.js -d
 // go to localhost:11001
 ```
 

@@ -13,11 +13,13 @@ require('./lib/reqFrame')()
 var getCSS = require('./lib/getCSS')
 var drawGrid = require('./lib/grid.js')
 var squarejob = require('./lib/squarejob');
+var drawLines = require('./lib/drawEnergy.js');
+var mDisplay = require('./lib/mDisplay.js');
 var pice = require('./lib/pices.js');
-var rgba = require('./lib/rgba.js')
-var energyProses = require('./lib/energyzer.js')
-var rectSect = require('./lib/rectIntersect')
-var w,h,draw,drawS,lifeSize,zom,data,data2,action;
+var rgba = require('./lib/rgba.js');
+var energyProses = require('./lib/energyzer.js');
+var rectSect = require('./lib/rectIntersect');
+var w,h,draw,drawS,drawES,drawM,lifeSize,zom,data,data2,action;
 var pices = new Array();
 var tasks = new Array();
 var energyMesseg = new Array();
@@ -29,6 +31,10 @@ var safty
 var temparray = new Array();
 var ttemparray = new Array()
 var nu = 0
+
+var stempNum = 1;
+
+
 
 function command(type,point){
   var ex = point.detail.x + window.scrollX
@@ -45,13 +51,13 @@ function command(type,point){
           ey:ey,
           team:playerTeam,
           timestamp:new Date().getTime(),
-          length:stemp.shape[0],	 
+          length:stempStor[stempNum].shape[0],	 
         },
-        data: stemp.data, 
+        data: stempStor[stempNum].data, 
       }
 
   stream.write(JSON.stringify(task))
-  task.data = stemp
+  task.data = stempStor[stempNum]
   tasks.push(task)
 }
 
@@ -183,21 +189,38 @@ function executer(line){
 
 
 init()
-  pices.push(new pice.set("base",20,10,10))
+  pices.push(new pice.set("base",20,20,10))
 
-  pices.push(new pice.set("base",30,20,20))
-  pices.push(new pice.set("base",25,15,0))
-  pices.push(new pice.set("base",100,50,20))
+  pices.push(new pice.set("base",30,50,20))
+	
+  pices.push(new pice.set("base",15,30,0))
+  pices.push(new pice.set("base",35,40,0))
+
 
 function init(){
   w = 2000 //window.innerWidth * 2
   h = 2000 //window.innerHeight * 2
   draw = ui.board.getContext('2d')
   drawS = ui.stemps.getContext('2d')
-  lifeSize = 45 
+  lifeSize = 30 
+  drawL = ui.lines.getContext('2d')
+//  drawES = ui.energyStatus.getContext('2d')
+  drawM = ui.mouse.getContext('2d')
   draw.strokeStyle = rgba(255,255,255,1) 
   stempSize = 40
   zoom = 1;
+  ui.lines.style.width = w + 'px'
+  ui.lines.style.height =h + 'px'
+  ui.lines.width = w
+  ui.lines.height = h
+  ui.mouse.style.width = w + 'px'
+  ui.mouse.style.height =h + 'px'
+  ui.mouse.width = w
+  ui.mouse.height = h
+  ui.tuchPad.style.width = w + 'px'
+  ui.tuchPad.style.height =h + 'px'
+  ui.tuchPad.width = w
+  ui.tuchPad.height = h
   ui.board.style.width = w + 'px'
   ui.board.style.height =h + 'px'
   ui.board.width = w
@@ -212,18 +235,28 @@ function init(){
 function run(evt){
   rules(prev, next)
   squarejob(next, draw, lifeSize)
+
+  drawLines(drawL,h,w,pices,playerTeam,lifeSize)
   tern ++
+  
+ for(i=0;i<pices.length;i++){	
+	pices[i].markB(playerTeam,lifeSize,draw)
+ }
+
   for(i=0;i<pices.length;i++){
      pices[i].capture(next)
      pices[i].mark(playerTeam,lifeSize,draw)
+	
 
      if(pices[i].type === "base" && pices[i].player === playerTeam){
-  nu++
-  energyMesseg.push("base number" , nu , "posess " , pices[i].energy, "energy ")
+  	nu++
+  	energyMesseg.push("base number" , nu , "posess " , pices[i].energy, "energy ")
      }
      if(tern === 3 && pices[i].type === "base") pices[i].energy ++
 
   }
+
+
   if(tern === 3) tern = 0;
   for(var i = 0; i < next.shape[0]; i++){
     for(var j = 0; j < next.shape[1]; j++){
@@ -234,12 +267,13 @@ function run(evt){
   nu = 0
   ui.energy.value = energyMesseg.join(" ")
   energyMesseg = new Array()
+
 }
 
 
 var ePoint 
 ui.stemps.addEventListener('touchdown',drawStemp)
-ui.board.addEventListener('touchdown', function (e){
+ui.tuchPad.addEventListener('touchdown', function (e){
   ePoint = e
   command(action,ePoint)
 })
@@ -262,6 +296,34 @@ module.exports = {
   stop: stop,
   step: step,
 }
+
+body.onmousemove = function (e){
+	if(action == "BStemp"){
+		ePoint = e
+		mDisplay.stemp(drawM,h,w,ePoint,lifeSize,stempStor[stempNum]) 
+	}
+	else{
+		ePoint = e
+		mDisplay.building(drawM,h,w,ePoint,lifeSize,action)
+	}		
+}
+
+
+ui.stump1.addEventListener('touchdown',function(){
+stempNum = 1;
+//stemp  = stempStor[1]
+ squarejob(stempStor[stempNum],drawS,stempSize)
+})
+ui.stump2.addEventListener('touchdown',function(){
+stempNum = 2;
+//stemp = stempStor[2]
+ squarejob(stempStor[stempNum],drawS,stempSize)
+})
+ui.stump3.addEventListener('touchdown',function(){
+stempNum = 3;
+//stemp = stempStor[3];
+ squarejob(stempStor[stempNum],drawS,stempSize)
+})
 
 
 
@@ -312,34 +374,46 @@ action = "BFort"
 
 
 
-
+var sData = new Array();
 data = new Uint8ClampedArray(Math.ceil(w / lifeSize) * Math.ceil(h / lifeSize))
 data2 = new Uint8ClampedArray(Math.ceil(w / lifeSize) * Math.ceil(h / lifeSize))
-data3 = new Uint8ClampedArray(Math.ceil(200 / stempSize) * Math.ceil(200 / stempSize))
+for(i=0 ; i < 4 ;i++)
+sData[i] = new Uint8ClampedArray(Math.ceil(200 / stempSize) * Math.ceil(200 / stempSize))
 
 
 for(var x = 0; x < data.length; x++){
   data[x] = 100;
   data2[x] = 100;
 }
-for(x = 0; x<data3.length; x++) data3[x] =100;
+for(i = 0 ; i < 4 ; i++){
+for(x = 0; x<sData[i].length; x++) sData[i][x] =100;
+}
 
 var prev = ndarray(data, [Math.ceil(w / lifeSize), Math.ceil(h / lifeSize)]);
 var next = ndarray(data2, [Math.ceil(w / lifeSize), Math.ceil(h / lifeSize)]);
-var stemp = ndarray(data3, [Math.ceil(200 / 40), Math.ceil(200 / 40)]);
+//var stemp = ndarray(data3, [Math.ceil(200 / 40), Math.ceil(200 / 40)]);
+var stempStor = new Array();
+stempStor[1] = ndarray(sData[1], [Math.ceil(200 / 40), Math.ceil(200 / 40)]);
+stempStor[2] = ndarray(sData[2], [Math.ceil(200 / 40), Math.ceil(200 / 40)]);
+stempStor[3] = ndarray(sData[3], [Math.ceil(200 / 40), Math.ceil(200 / 40)]);
+
 ///var stempS = ndarray(data3, [Math.ceil(123 / 40), Math.ceil(267 / 40)]);
 
 
   var pixel = draw.getImageData(0,0,100,100)
 
   var anim = 0;
-  touchdown.start(ui.board);
+  touchdown.start(ui.tuchPad);
+  touchdown.start(ui.lines);
   touchdown.start(ui.step)
   touchdown.start(ui.play)
   touchdown.start(ui.stop)
   touchdown.start(ui.p1)
   touchdown.start(ui.p2)
   touchdown.start(ui.stemps)
+  touchdown.start(ui.stump1)
+  touchdown.start(ui.stump2)
+  touchdown.start(ui.stump3)
  // touchdown.start(ui.stempNum)
   //touchdown.start(ui.stempSave)
   touchdown.start(ui.BStemp)
@@ -361,11 +435,27 @@ var stemp = ndarray(data3, [Math.ceil(200 / 40), Math.ceil(200 / 40)]);
 
   }
 
+  function drawL(t){
+
+    window.requestAnimationFrame(drawL)
+  }
+
   function drawS(t){
 
-    window.requestAnimationFrame(draw)
-
+    window.requestAnimationFrame(drawS)
   }
+
+  function drawES(t){
+
+    window.requestAnimationFrame(drawES)
+  }
+
+  function mouse(t){
+  
+    window.requestAnimationFrame(drawM)
+  }
+
+
 
 function stop(){
   window.cancelAnimationFrame(anim)
@@ -389,6 +479,7 @@ function builder(ex,ey,type,team){
     if(energyPross[0]){
       pices = energyPross[1];
       pices.push(new pice.set(type,ex,ey,team,pices))
+
     }
     else
       console.log("you do not have enugh energy");
@@ -404,7 +495,7 @@ function springStemp(ex,ey,team,Tstemp){
   var obs = 0;
   var n = 0;
   var zbord , zstemp, x, y;
-
+  var price = 0;
 
   for(i = 0 ; i < Tstemp.shape[0] ; i++){      //// run therow all stemp 2d array
     for(j = 0 ; j < Tstemp.shape[1] ; j++){
@@ -414,9 +505,10 @@ function springStemp(ex,ey,team,Tstemp){
         y = ey + j
         zbord = prev.get(x,y)
         if(zbord === 100){
-          energy =  energyProses(pices,team,x,y,1,"spun")
+          energy =  energyProses(pices,team,x,y,0,"spun")
           if(energy[0]) {
             tempPices = energy[1]
+	    price++
           }
           else obs = 100;
           }
@@ -427,6 +519,9 @@ function springStemp(ex,ey,team,Tstemp){
     }
   }
   if(obs === 0){
+  energy = energyProses(pices,team,x,y,price,"spun")
+  if(energy[0])
+  {
     n = 0
     for(i = 0 ; i < Tstemp.shape[0] ; i++){
       for(j = 0 ; j < Tstemp.shape[1] ; j++){
@@ -442,6 +537,7 @@ function springStemp(ex,ey,team,Tstemp){
     }
     pices = tempPices
   }
+  }
   else if(obs<100)
     console.log("cant create", obs, "obsticles");
   else if(obs === 200)
@@ -449,6 +545,9 @@ function springStemp(ex,ey,team,Tstemp){
   else
     console.log("out of your inflouens fild");
 }
+
+
+
 
 function drawStemp(e){
   var x = e.detail.x + window.scrollX, y = e.detail.y + window.scrollY;
@@ -458,11 +557,12 @@ function drawStemp(e){
   y -= y % stempSize
   x /= stempSize
   y /= stempSize
-  var z = stemp.get(x,y)
+  var z = stempStor[stempNum].get(x,y)
   if(z === 100) z = 0
   else z = 100
-  stemp.set(x,y,z)
-  squarejob(stemp,drawS,stempSize)
+  stempStor[stempNum].set(x,y,z)
+  //stemp.set(x,y,z)
+  squarejob(stempStor[stempNum],drawS,stempSize)
 }
 
 /*

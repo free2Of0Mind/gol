@@ -1,7 +1,7 @@
 {
   "name": "gol",
-  "version": "0.0.0",
-  "description": "game of life",
+  "version": "0.0.1",
+  "description": "game of life as a multy player strategy game",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -16,5 +16,6 @@
     "fakefix" : ""
   },
   "author": "Johnny Honestly <mostmodernist@gmail.com> (http://johnnyscript.us/)",
+  "author": "Auriel Klasovsky <free2of0mind@gmail.com>",
   "license": "BSD-2-Clause"
 }

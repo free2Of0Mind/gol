@@ -1,4 +1,5 @@
 body, body > *{
+
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	-webkit-margin-start: 0;
@@ -13,6 +14,12 @@ body, body > *{
 	margin:0;
 	padding:0;
 }
+body{
+height:100%;
+width:100%;
+}
+
+
 
 ::-webkit-input-placeholder{
     font-weight:900;
@@ -22,8 +29,66 @@ div{
     margin:0px;
     padding:0px;  
 }
+div.mainFrame{
+	position:fixed;
+	left:0px;
+	top:0px;
+	height:100%;
+	width:100%;
+}
+div.controls{
+	z-index:4;
+	float:right;
+	width: 15%;
+}
+div.Board{
+	position:relative;
+	height: 80%;
+	width: 80%;
+	float:left;
+	overflow:scroll;
+	
+}
+div.Board > canvas{
+	top:0px;
+	left:0px;
+}
+#stemps{
+	position:relative;
+	display:block;
+}
+#board{
+	z-index:0;
 
+	position:;
+	top:0px;
+	left:0px;
 
+}
+#lines{
+	z-index:1;
+
+	position:absolute;
+	top:0px;
+	left:0px;
+
+}
+#mouse{
+	z-index:2;
+
+	position:absolute;
+	top:0px;
+	left:0px;
+
+}
+#tuchPad{
+	z-index:3;
+
+	position:absolute;
+	top:0px;
+	left:0px;
+
+}
 textarea {
     border-bottom-color: rgb(238, 238, 238);
     border-bottom-style: inset;

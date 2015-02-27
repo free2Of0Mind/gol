@@ -4,42 +4,49 @@
     <meta name="viewport" content="user-scalable=no"></meta>
     <title>OPA!</title>
     <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="control.css" />
-
-    <link rel="stylesheet" href="gol.css" />
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   </head>
   <body>
-<div class="container" id= "messeg">
-
+<div class="mainFrame">
+<div class="container" id= "messegeszzz">
+	<p id="toturial"></p>
+	<a id="hideShow"></a>   
+	
 </div>
-
-    <canvas id="board"></canvas>
-    <canvas id="lines"></canvas>
-    <canvas id="energyStatus"></canvas>
-    <canvas class="mouse" id="mouse"></canvas>
-    <canvas id="tuchPad"></canvas>
-    <div class="container" id="controls">
-	<div class="Chead" id="headdingOfContainer">
-	<h>Game Of Life ID</h>
-	</div>
+<div class="Board" id="gameFrame">
+	<canvas id="tuchPad"></canvas>
+	<canvas id="mouse"></canvas>
+	<canvas id="lines"></canvas>
+      <canvas id="board"></canvas>
+</div>
+<div class="container" id="controls">
+	<h1>so lets go</h1>
       <button id="play">play</button>
       <button id="stop">stop</button>
       <button id="step">step</button>
-      <button id="p2">p2</button>   
+	<hr>
       <button id="p1">p1</button>   
+      <button id="p2">p2</button>  
+	<hr> 
       <button id="BStemp">stemp</button> 
       <button id="BStatian">statian</button> 
       <button id="BTurent">turent</button> 
-
-      <button id="stump1">1</button>   
-      <button id="stump2">2</button>   
-      <button id="stump3">3</button>   
-	<textarea id="energy"> we are all but boxes floting in the darkness of a pixel </textarea>
-
-    </div>
-    
+	<hr>
+      <button id="stump1">stemp1</button>  
+      <button id="stump2">stemp2</button>  
+      <button id="stump3">stemp3</button>  	
+	<br>
+      <button id="spin">rotation</button>  
+	<hr>
     <canvas id="stemps"></canvas>
+</div>
+<div class="buttomFrame">    
+
+	<button id="next">Next</button>
+	<textarea id="messeges"></textarea>
+	<textarea id="energy"> we are all but boxes floting in the darkness of a pixel </textarea>
+</div>
+</div>
     <script type="text/javascript" src="modernizr.js"></script>
     <script type="text/javascript" src="bundle.js"></script>
   </body>

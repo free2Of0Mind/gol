@@ -19,6 +19,8 @@ var pice = require('./lib/pices.js');
 var rgba = require('./lib/rgba.js');
 var energyProses = require('./lib/energyzer.js');
 var rectSect = require('./lib/rectIntersect');
+var spin = require('./lib/spin.js')
+var toturial = require('./lib/toturial.js')
 var w,h,draw,drawS,drawES,drawM,lifeSize,zom,data,data2,action;
 var pices = new Array();
 var tasks = new Array();
@@ -229,32 +231,33 @@ function init(){
   ui.stemps.height = 200
   fakefix(ui.stemps)
   fakefix(ui.controls)
+  fakefix(ui.toturial)
   drawGrid(draw, w, h, lifeSize)
   drawGrid(drawS, 200, 200, stempSize)
 }
 function run(evt){
+  
+  gamePlay()
   rules(prev, next)
   squarejob(next, draw, lifeSize)
 
   drawLines(drawL,h,w,pices,playerTeam,lifeSize)
   tern ++
-  
- for(i=0;i<pices.length;i++){	
-	pices[i].markB(playerTeam,lifeSize,draw)
- }
-
-  for(i=0;i<pices.length;i++){
+    for(i=0;i<pices.length;i++){
      pices[i].capture(next)
      pices[i].mark(playerTeam,lifeSize,draw)
 	
+     pices[i].markB(playerTeam,lifeSize,draw)
 
      if(pices[i].type === "base" && pices[i].player === playerTeam){
   	nu++
   	energyMesseg.push("base number" , nu , "posess " , pices[i].energy, "energy ")
      }
      if(tern === 3 && pices[i].type === "base") pices[i].energy ++
-
+  pices[i].power = false
   }
+ //energyPross = energyProses(pices,team,0,0,0,"build")
+
 
 
   if(tern === 3) tern = 0;
@@ -269,7 +272,18 @@ function run(evt){
   energyMesseg = new Array()
 
 }
+var HS = 0
+ui.hideShow.addEventListener('touchdown',function(){
+if(HS == 0){
+HS = 1;
+ui.messeges.className = "off"
+}
+else{
+HS = 0;
+ui.messeges.className = "on"
+}
 
+})
 
 var ePoint 
 ui.stemps.addEventListener('touchdown',drawStemp)
@@ -297,32 +311,61 @@ module.exports = {
   step: step,
 }
 
-body.onmousemove = function (e){
+/*
+ui.tuchPad.addEventListener('mousemove', function (e){
+console.log('?');
+var scrool = ui.tuchPad.getBoundingClientRect();
+console.log("!?");
 	if(action == "BStemp"){
 		ePoint = e
-		mDisplay.stemp(drawM,h,w,ePoint,lifeSize,stempStor[stempNum]) 
+		mDisplay.stemp(drawM,h,w,ePoint,scrool,lifeSize,stempStor[stempNum]) 
 	}
 	else{
 		ePoint = e
-		mDisplay.building(drawM,h,w,ePoint,lifeSize,action)
+		mDisplay.building(drawM,h,w,ePoint,scrool,lifeSize,action)
 	}		
-}
+})
 
-
+*/
 ui.stump1.addEventListener('touchdown',function(){
-stempNum = 1;
-//stemp  = stempStor[1]
+stempNum = 1;i
+ui.stump1.className = "used";
+ui.stump2.className = "unUsed";
+ui.stump3.className = "unUsed";
+
+
+
+//the class is just a graphical thing 
+
  squarejob(stempStor[stempNum],drawS,stempSize)
 })
 ui.stump2.addEventListener('touchdown',function(){
 stempNum = 2;
-//stemp = stempStor[2]
+ui.stump2.className = "used";
+ui.stump1.className = "unUsed";
+ui.stump3.className = "unUsed";
+
+
  squarejob(stempStor[stempNum],drawS,stempSize)
 })
 ui.stump3.addEventListener('touchdown',function(){
 stempNum = 3;
-//stemp = stempStor[3];
+ui.stump3.className = "used";
+ui.stump2.className = "unUsed";
+ui.stump1.className = "unUsed";
+
+
  squarejob(stempStor[stempNum],drawS,stempSize)
+
+
+
+})
+
+ui.spin.addEventListener('touchdown',function(){
+
+ spin(stempStor[stempNum])
+ squarejob(stempStor[stempNum],drawS,stempSize)
+
 })
 
 
@@ -343,6 +386,12 @@ playerTeam = 30
 
 ui.BStemp.addEventListener('touchdown',function(){
   action = "BStemp"
+
+ui.BStemp.className = "used"
+ui.BStatian.className = "unUsed"
+ui.BTurent.className = "unUsed"
+
+
 })
 
 /*
@@ -353,12 +402,21 @@ action = "BBase"
 
 ui.BStatian.addEventListener('touchdown',function(){
   action = "BStation"
+
+ui.BStemp.className = "unUsed"
+ui.BStatian.className = "used"
+ui.BTurent.className = "unUsed"
 })
 
 
 
 ui.BTurent.addEventListener('touchdown',function(){
   action = "BTurent"
+
+ui.BStemp.className = "unUsed"
+ui.BStatian.className = "unUsed"
+ui.BTurent.className = "used"
+
 })
 
 
@@ -422,9 +480,9 @@ stempStor[3] = ndarray(sData[3], [Math.ceil(200 / 40), Math.ceil(200 / 40)]);
  touchdown.start(ui.BStatian)
 // touchdown.start(ui.BFort)
  touchdown.start(ui.BTurent)
-
-
-
+ touchdown.start(ui.spin)
+ touchdown.start(ui.next)
+  touchdown.start(ui.hideShow)
 
 
 
@@ -562,8 +620,61 @@ function drawStemp(e){
   else z = 100
   stempStor[stempNum].set(x,y,z)
   //stemp.set(x,y,z)
+
   squarejob(stempStor[stempNum],drawS,stempSize)
+  drawGrid(drawS, 200, 200, stempSize, 1)
+
 }
+
+
+//// now this is wher the game starts
+
+var victory = 1
+
+pices = new Array();
+pices.push(new pice.set("base",13,13,10))
+pices.push(new pice.set("turent",30,13,20))
+var startflag = 0;
+var chapter = 0;
+ui.next.addEventListener('touchdown',function(){
+if(victory == 1){ 
+ 	 chapter ++
+ 	 victory = 0
+ 	 playerTeam = 10;
+	startflag = 1;
+}
+})
+
+
+function gamePlay(){
+toturial(pices,ui,chapter)
+if(toturial(pices,ui,chapter) == "victory") victory = 1;
+if(chapter == 2 && startflag == 1){
+	pices.push(new pice.set("base",20,40,20))
+	pices.push(new pice.set("turent",24,30,20))
+	pices.push(new pice.set("station",15,35,20))
+	
+	prev.set(21,40,20)
+	prev.set(20,40,20)
+	prev.set(19,40,20)
+	prev.set(20,41,20)
+
+	prev.set(23,29,20)
+	prev.set(23,30,20)
+	prev.set(22,29,20)
+	prev.set(22,30,20)
+
+	startflag = 0;
+}
+
+
+}
+
+
+
+
+
+
 
 /*
 var screen = fs(document.body);

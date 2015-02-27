@@ -3,6 +3,13 @@ body{
   width:2000px;
   height:2000px;
 }
+textarea.on{
+display: inline;
+}
+textarea.off{
+display: none;
+} 
+
 #board{
   position:absolute;
   left:0;
@@ -49,7 +56,17 @@ body{
 
 #controls > button{
   display:block;
+  float:left;
+ 
 }
+button.unUsed{
+color: black;
+
+}
+button.used{
+color: red;
+}
+
 
 div.Chead{
 	height: 20px;
@@ -86,4 +103,21 @@ div.Chead{
 
   border:0;
   margin:0;
+}
+#bluePrint{
+width:100px;
+height:200px;
+}
+#toturial{
+position:absolute;
+top:10px;
+left:30px;
+}
+#messegs {
+  width:600px;
+  height:200px;
+
+  border:0;
+  margin:0;
+
 }
